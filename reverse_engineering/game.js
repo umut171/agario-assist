@@ -1,5 +1,5 @@
 (function (window, jQuery) {
-  var $, Ba, D, E, Ea, F, Fa, H, I, L, M, N, O, Q, R, V, W, X, Y, Z, _canvas, aa, blackTheme, ca, canvas, canvasHeight, canvasWidth, ctx, h, hardMode, isMobile, mouseX, mouseY, n, q, qa, r, ra, renderedScoreboard, sa, ta, w, x, y, z, zoom;
+  var $, Ba, C, D, E, Ea, F, Fa, G, H, I, K, L, M, N, Q, R, S, T, V, W, _canvas, aa, blackTheme, ca, canvas, canvasHeight, canvasWidth, ctx, hardMode, isMobile, l, m, mouseX, mouseY, p, pa, qa, ra, renderedScoreboard, s, sa, t, u, v, w, x, y, zoom;
 
   function init() {
     var a, b, c;
@@ -14,19 +14,19 @@
         c = e.clientY - (5 + canvasWidth / 5 / 2);
         if (Math.sqrt(b * b + c * c) <= canvasWidth / 5 / 2) {
           sendTargetUpdate();
-          C(17);
+          B(17);
           return;
         }
       }
       mouseX = e.clientX;
       mouseY = e.clientY;
-      T();
+      Y();
       sendTargetUpdate();
     };
     canvas.onmousemove = function (e) {
       mouseX = e.clientX;
       mouseY = e.clientY;
-      T();
+      Y();
     };
     canvas.onmouseup = function (e) {};
     a = false;
@@ -35,17 +35,20 @@
     window.onkeydown = function (e) {
       if (!(32 != e.keyCode || a)) {
         sendTargetUpdate();
-        C(17);
+        B(17);
         a = true;
       };
       if (!(81 != e.keyCode || b)) {
-        C(18);
+        B(18);
         b = true;
       };
       if (!(87 != e.keyCode || c)) {
         sendTargetUpdate();
-        C(21);
+        B(21);
         c = true;
+      };
+      if (27 == e.keyCode) {
+        jQuery('#overlays').fadeIn(200);
       };
     };
     window.onkeyup = function (e) {
@@ -56,12 +59,12 @@
         c = false;
       };
       if (81 == e.keyCode && b) {
-        C(19);
+        B(19);
         b = false;
       };
     };
     window.onblur = function (e) {
-      C(19);
+      B(19);
       c = b = a = false;
     };
     window.onresize = onResize;
@@ -77,114 +80,125 @@
 
   function think() {
     var a, b, c, d, e, f;
-    a = Number.POSITIVE_INFINITY;
-    b = Number.POSITIVE_INFINITY;
-    c = Number.NEGATIVE_INFINITY;
-    f = Number.NEGATIVE_INFINITY;
-    d = 0;
-    for (e = 0; e < r.length; e++) {
-      d = Math.max(r[e].size, d);
-      a = Math.min(r[e].x, a);
-      b = Math.min(r[e].y, b);
-      c = Math.max(r[e].x, c);
-      f = Math.max(r[e].y, f);
-    }
-    V = QUAD.init({
-      minX: a - (d + 100),
-      minY: b - (d + 100),
-      maxX: c + (d + 100),
-      maxY: f + (d + 100)
-    });
-    for (e = 0; e < r.length; e++) {
-      a = r[e];
-      if (a.shouldRender()) {
-        for (b = 0; b < a.points.length; ++b) {
-          V.insert(a.points[b]);
+    if (0.5 > zoom) {
+      K = null;
+    } else {
+      a = Number.POSITIVE_INFINITY;
+      b = Number.POSITIVE_INFINITY;
+      c = Number.NEGATIVE_INFINITY;
+      e = Number.NEGATIVE_INFINITY;
+      d = 0;
+      for (f = 0; f < p.length; f++) {
+        if (p[f].shouldRender()) {
+          d = Math.max(p[f].size, d);
+          a = Math.min(p[f].x, a);
+          b = Math.min(p[f].y, b);
+          c = Math.max(p[f].x, c);
+          e = Math.max(p[f].y, e);
+        };
+      }
+      K = QUAD.init({
+        minX: a - (d + 100),
+        minY: b - (d + 100),
+        maxX: c + (d + 100),
+        maxY: e + (d + 100)
+      });
+      for (f = 0; f < p.length; f++) {
+        a = p[f];
+        if (a.shouldRender()) {
+          for (b = 0; b < a.points.length; ++b) {
+            K.insert(a.points[b]);
+          }
         }
       }
     }
   }
 
-  function T() {
-    L = (mouseX - canvasWidth / 2) / zoom + x;
-    M = (mouseY - canvasHeight / 2) / zoom + y;
+  function Y() {
+    Q = (mouseX - canvasWidth / 2) / zoom + s;
+    R = (mouseY - canvasHeight / 2) / zoom + t;
   }
 
   function refreshRegionInfo() {
-    if (null == N) {
-      N = {};
+    if (null == S) {
+      S = {};
       jQuery('#region').children().each(function () {
         var a, b;
         a = jQuery(this);
         b = a.val();
         if (b) {
-          N[b] = a.text();
+          S[b] = a.text();
         };
       });
     };
     jQuery.get('http://m.agar.io/info', function (a) {
       var b;
       for (b in a.regions) {
-        jQuery('#region option[value="' + b + '"]').text(N[b] + ' (' + a.regions[b].numPlayers + ' players)');
+        jQuery('#region option[value="' + b + '"]').text(S[b] + ' (' + a.regions[b].numPlayers + ' players)');
       }
     }, 'json');
   }
 
+  function ja() {
+    jQuery('#adsBottom').hide();
+    jQuery('#overlays').hide();
+  }
+
   function ia(a) {
-    if (a && a != W) {
-      W = a;
-      ja();
+    if (a && a != $) {
+      $ = a;
+      ka();
     };
   }
 
-  function ka() {
+  function la() {
     jQuery.ajax('http://m.agar.io/', {
       error: function () {
-        setTimeout(ka, 1000);
+        setTimeout(la, 1000);
       },
       success: function (a) {
         a = a.split('\n');
-        la('ws://' + a[0]);
+        ma('ws://' + a[0]);
       },
       dataType: 'text',
       method: 'POST',
       cache: false,
       crossDomain: true,
-      data: W || '?'
+      data: $ || '?'
     });
   }
 
-  function ja() {
+  function ka() {
     jQuery('#connecting').show();
-    ka();
+    la();
   }
 
-  function la(a) {
-    if (h) {
-      h.onopen = null;
-      h.onmessage = null;
-      h.onclose = null;
-      h.close();
-      h = null;
+  function ma(a) {
+    if (l) {
+      l.onopen = null;
+      l.onmessage = null;
+      l.onclose = null;
+      l.close();
+      l = null;
     };
+    C = [];
+    m = [];
+    v = {};
+    p = [];
     D = [];
-    n = [];
-    z = {};
-    r = [];
-    E = [];
-    q = [];
+    w = [];
     console.log('Connecting to ' + a);
-    h = new WebSocket(a);
-    h.binaryType = 'arraybuffer';
-    h.onopen = wa;
-    h.onmessage = xa;
-    h.onclose = ya;
-    h.onerror = function (e) {
+    l = new WebSocket(a);
+    l.binaryType = 'arraybuffer';
+    l.onopen = va;
+    l.onmessage = wa;
+    l.onclose = xa;
+    l.onerror = function (e) {
       console.log('socket error');
     };
   }
 
-  function wa(a) {
+  function va(a) {
     var b;
     jQuery('#connecting').hide();
     console.log('socket open');
@@ -192,22 +206,22 @@
     b = new DataView(a);
     b.setUint8(0, 255);
     b.setUint32(1, 1, true);
-    h.send(a);
-    ma();
-  }
-
-  function ya(a) {
-    console.log('socket close');
-    setTimeout(ja, 500);
+    l.send(a);
+    na();
   }
 
   function xa(a) {
+    console.log('socket close');
+    setTimeout(ka, 500);
+  }
+
+  function wa(a) {
     var c, d, e, f;
 
     function b() {
       var a, b;
       for (a = '';;) {
-        b = f.getUint16(c, true);
+        b = e.getUint16(c, true);
         c += 2;
         if (0 == b) {
           break;
@@ -217,259 +231,201 @@
       return a;
     }
     c = 1;
-    f = new DataView(a.data);
-    switch (f.getUint8(0)) {
+    e = new DataView(a.data);
+    switch (e.getUint8(0)) {
     case 16:
-      za(f);
+      ya(e);
+      break;
+    case 17:
+      x = e.getFloat64(1, true);
+      y = e.getFloat64(9, true);
+      L = e.getFloat64(17, true);
       break;
     case 20:
-      n = [];
-      D = [];
+      m = [];
+      C = [];
       break;
     case 32:
-      D.push(f.getUint32(1, true));
-      break;
-    case 48:
-      for (q = []; c < f.byteLength;) {
-        q.push({
-          id: 0,
-          name: b()
-        });
-      }
-      na();
+      C.push(e.getUint32(1, true));
       break;
     case 49:
-      a = f.getUint32(c, true);
+      a = e.getUint32(c, true);
       c += 4;
-      q = [];
+      w = [];
       for (d = 0; d < a; ++d) {
-        e = f.getUint32(c, true);
+        f = e.getUint32(c, true);
         c = c + 4;
-        q.push({
-          id: e,
+        w.push({
+          id: f,
           name: b()
         });
       }
-      na();
+      za();
       break;
     case 64:
-      X = f.getFloat64(1, true);
-      Y = f.getFloat64(9, true);
-      Z = f.getFloat64(17, true);
-      $ = f.getFloat64(25, true);
-      if (0 == n.length) {
-        x = (Z + X) / 2;
-        y = ($ + Y) / 2;
+      E = e.getFloat64(1, true);
+      F = e.getFloat64(9, true);
+      G = e.getFloat64(17, true);
+      H = e.getFloat64(25, true);
+      x = (G + E) / 2;
+      y = (H + F) / 2;
+      L = 1;
+      if (0 == m.length) {
+        s = x;
+        t = y;
+        zoom = L;
       };
     }
   }
 
-  function za(a) {
-    var b, c, d, e, f, g, h, k, l, m, p, q, s, t, u;
-    F = +new Date();
+  function ya(a) {
+    var b, c, d, e, f, g, h, k, l, n;
+    I = +new Date();
     b = Math.random();
     c = 1;
     aa = false;
-    f = a.getUint16(c, true);
+    e = a.getUint16(c, true);
     c = c + 2;
-    for (d = 0; d < f; ++d) {
-      e = z[a.getUint32(c, true)];
-      t = z[a.getUint32(c + 4, true)];
+    for (d = 0; d < e; ++d) {
+      f = v[a.getUint32(c, true)];
+      g = v[a.getUint32(c + 4, true)];
       c = c + 8;
-      if (e && t) {
-        t.destroy();
-        t.ox = t.x;
-        t.oy = t.y;
-        t.oSize = t.size;
-        t.nx = e.x;
-        t.ny = e.y;
-        t.nSize = t.size;
-        t.updateTime = F;
+      if (f && g) {
+        g.destroy();
+        g.ox = g.x;
+        g.oy = g.y;
+        g.oSize = g.size;
+        g.nx = f.x;
+        g.ny = f.y;
+        g.nSize = g.size;
+        g.updateTime = I;
       };
     }
     for (;;) {
-      f = a.getUint32(c, true);
+      e = a.getUint32(c, true);
       c += 4;
-      if (0 == f) {
+      if (0 == e) {
         break;
       }
       d = a.getFloat64(c, true);
-      c = c + 8;
-      e = a.getFloat64(c, true);
-      c = c + 8;
-      t = a.getFloat64(c, true);
-      c = c + 8;
+      c += 8;
+      f = a.getFloat64(c, true);
+      c += 8;
+      g = a.getFloat64(c, true);
+      c += 8;
+      a.getUint8(c++);
+      h = a.getUint8(c++);
       l = a.getUint8(c++);
-      h = false;
-      if (0 == l) {
-        h = true;
-        l = '#33FF33';
-      } else {
-        if (255 == l) {
-          h = a.getUint8(c++);
-          l = a.getUint8(c++);
-          g = a.getUint8(c++);
-          l = oa(h << 16 | l << 8 | g);
-          g = a.getUint8(c++);
-          h = !!(g & 1);
-          if (g & 2) {
-            c += 4;
-          };
-          if (g & 4) {
-            c += 8;
-          };
-          if (g & 8) {
-            c += 16;
-          };
-        } else {
-          l = 63487 | l << 16;
-          k = (l >> 16 & 255) / 255 * 360;
-          m = (l >> 8 & 255) / 255;
-          l = (l >> 0 & 255) / 255;
-          if (0 == m) {
-            l = l << 16 | l << 8 | l << 0;
-          } else {
-            k = k / 60;
-            g = ~~k;
-            u = k - g;
-            k = l * (1 - m);
-            s = l * (1 - m * u);
-            m = l * (1 - m * (1 - u));
-            p = u = 0;
-            q = 0;
-            switch (g % 6) {
-            case 0:
-              u = l;
-              p = m;
-              q = k;
-              break;
-            case 1:
-              u = s;
-              p = l;
-              q = k;
-              break;
-            case 2:
-              u = k;
-              p = l;
-              q = m;
-              break;
-            case 3:
-              u = k;
-              p = s;
-              q = l;
-              break;
-            case 4:
-              u = m;
-              p = k;
-              q = l;
-              break;
-            case 5:
-              u = l;
-              p = k;
-              q = s;
-            }
-            u = ~~(255 * u) & 255;
-            p = ~~(255 * p) & 255;
-            q = ~~(255 * q) & 255;
-            l = u << 16 | p << 8 | q;
-          }
-          l = oa(l);
-        }
+      k = a.getUint8(c++);
+      for (h = (h << 16 | l << 8 | k).toString(16); 6 > h.length;) {
+        h = '0' + h;
       }
-      for (g = '';;) {
-        k = a.getUint16(c, true);
-        c += 2;
-        if (0 == k) {
+      h = '#' + h;
+      k = a.getUint8(c++);
+      l = !!(k & 1);
+      if (k & 2) {
+        c += 4;
+      };
+      if (k & 4) {
+        c += 8;
+      };
+      if (k & 8) {
+        c += 16;
+      };
+      for (k = '';;) {
+        n = a.getUint16(c, true);
+        c = c + 2;
+        if (0 == n) {
           break;
         }
-        g += String.fromCharCode(k);
+        k += String.fromCharCode(n);
       }
-      k = null;
-      if (z.hasOwnProperty(f)) {
-        k = z[f];
-        k.updatePos();
-        k.ox = k.x;
-        k.oy = k.y;
-        k.oSize = k.size;
-        k.color = l;
+      n = null;
+      if (v.hasOwnProperty(e)) {
+        n = v[e];
+        n.updatePos();
+        n.ox = n.x;
+        n.oy = n.y;
+        n.oSize = n.size;
+        n.color = h;
       } else {
-        k = new Cell(f, d, e, t, l, h, g);
-        k.pX = d;
-        k.pY = e;
+        n = new Cell(e, d, f, g, h, l, k);
+        n.pX = d;
+        n.pY = f;
       };
-      k.nx = d;
-      k.ny = e;
-      k.nSize = t;
-      k.updateCode = b;
-      k.updateTime = F;
-      if (-1 != D.indexOf(f) && -1 == n.indexOf(k)) {
+      n.nx = d;
+      n.ny = f;
+      n.nSize = g;
+      n.updateCode = b;
+      n.updateTime = I;
+      if (-1 != C.indexOf(e) && -1 == m.indexOf(n)) {
         document.getElementById('overlays').style.display = 'none';
-        n.push(k);
-        if (1 == n.length) {
-          x = k.x;
-          y = k.y;
+        m.push(n);
+        if (1 == m.length) {
+          s = n.x;
+          t = n.y;
         };
       };
     }
     a.getUint16(c, true);
     c += 2;
-    e = a.getUint32(c, true);
+    f = a.getUint32(c, true);
     c += 4;
-    for (d = 0; d < e; d++) {
-      f = a.getUint32(c, true);
+    for (d = 0; d < f; d++) {
+      e = a.getUint32(c, true);
       c += 4;
-      if (z[f]) {
-        z[f].updateCode = b;
+      if (v[e]) {
+        v[e].updateCode = b;
       };
     }
-    for (d = 0; d < r.length; d++) {
-      if (r[d].updateCode != b) {
-        r[d--].destroy();
+    for (d = 0; d < p.length; d++) {
+      if (p[d].updateCode != b) {
+        p[d--].destroy();
       };
     }
-    if (aa && 0 == n.length) {
+    if (aa && 0 == m.length) {
       jQuery('#overlays').fadeIn(3000);
     };
   }
 
   function sendTargetUpdate() {
     var a, b;
-    if (null != h && h.readyState == h.OPEN) {
+    if (null != l && l.readyState == l.OPEN) {
       a = mouseX - canvasWidth / 2;
       b = mouseY - canvasHeight / 2;
-      if (!(64 > a * a + b * b || qa == L && ra == M)) {
-        qa = L;
-        ra = M;
+      if (!(64 > a * a + b * b || pa == Q && qa == R)) {
+        pa = Q;
+        qa = R;
         a = new ArrayBuffer(21);
         b = new DataView(a);
         b.setUint8(0, 16);
-        b.setFloat64(1, L, true);
-        b.setFloat64(9, M, true);
+        b.setFloat64(1, Q, true);
+        b.setFloat64(9, R, true);
         b.setUint32(17, 0, true);
-        h.send(a);
+        l.send(a);
       };
     }
   }
 
-  function ma() {
+  function na() {
     var a, b, c;
-    if (null != h && h.readyState == h.OPEN && null != H) {
-      a = new ArrayBuffer(1 + 2 * H.length);
+    if (null != l && l.readyState == l.OPEN && null != M) {
+      a = new ArrayBuffer(1 + 2 * M.length);
       b = new DataView(a);
       b.setUint8(0, 0);
-      for (c = 0; c < H.length; ++c) {
-        b.setUint16(1 + 2 * c, H.charCodeAt(c), true);
+      for (c = 0; c < M.length; ++c) {
+        b.setUint16(1 + 2 * c, M.charCodeAt(c), true);
       }
-      h.send(a);
+      l.send(a);
     }
   }
 
-  function C(a) {
+  function B(a) {
     var b;
-    if (null != h && h.readyState == h.OPEN) {
+    if (null != l && l.readyState == l.OPEN) {
       b = new ArrayBuffer(1);
       new DataView(b).setUint8(0, a);
-      h.send(b);
+      l.send(b);
     }
   }
 
@@ -486,37 +442,56 @@
     draw();
   }
 
-  function calculateZoom() {
-    var b, sizeFactor;
-    if (0 != n.length) {
-      sizeFactor = 0;
-      for (b = 0; b < n.length; b++) {
-        sizeFactor += n[b].size;
+  function Aa() {
+    var a, b;
+    if (0 != m.length) {
+      a = 0;
+      for (b = 0; b < m.length; b++) {
+        a += m[b].size;
       }
-      sizeFactor = Math.pow(Math.min(64 / sizeFactor, 1), 0.4) * Math.max(canvasHeight / 965, canvasWidth / 1920);
-      zoom = (9 * zoom + sizeFactor) / 10;
+      a = Math.pow(Math.min(64 / a, 1), 0.4) * Math.max(canvasHeight / 1080, canvasWidth / 1920);
+      zoom = (9 * zoom + a) / 10;
     }
   }
 
   function draw() {
-    var a, b, c, f;
+    var a, b, c, e;
     a = +new Date();
     ++Ba;
-    calculateZoom();
-    F = +new Date();
-    if (0 < n.length) {
+    I = +new Date();
+    if (0 < m.length) {
+      Aa();
       b = 0;
       c = 0;
-      for (f = 0; f < n.length; f++) {
-        n[f].updatePos();
-        b += n[f].x / n.length;
-        c += n[f].y / n.length;
+      for (e = 0; e < m.length; e++) {
+        m[e].updatePos();
+        b += m[e].x / m.length;
+        c += m[e].y / m.length;
       }
-      x = (x + b) / 2;
-      y = (y + c) / 2;
+      x = b;
+      y = c;
+      L = zoom;
+      s = (s + b) / 2;
+      t = (t + c) / 2;
+    } else {
+      if (x > G - (canvasWidth / 2 - 100) / zoom) {
+        x = G - (canvasWidth / 2 - 100) / zoom;
+      };
+      if (y > H - (canvasHeight / 2 - 100) / zoom) {
+        y = H - (canvasHeight / 2 - 100) / zoom;
+      };
+      if (x < E + (canvasWidth / 2 - 100) / zoom) {
+        x = (E + canvasWidth / 2 - 100) / zoom;
+      };
+      if (y < F + (canvasHeight / 2 - 100) / zoom) {
+        y = (F + canvasHeight / 2 - 100) / zoom;
+      };
+      s = (29 * s + x) / 30;
+      t = (29 * t + y) / 30;
+      zoom = (9 * zoom + L) / 10;
     }
     think();
-    T();
+    Y();
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
     ctx.fillStyle = blackTheme ? '#111111' : '#F2FBFF';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
@@ -526,43 +501,43 @@
     ctx.scale(zoom, zoom);
     b = canvasWidth / zoom;
     c = canvasHeight / zoom;
-    for (f = -0.5 + (-x + b / 2) % 50; f < b; f += 50) {
+    for (e = -0.5 + (-s + b / 2) % 50; e < b; e += 50) {
       ctx.beginPath();
-      ctx.moveTo(f, 0);
-      ctx.lineTo(f, c);
+      ctx.moveTo(e, 0);
+      ctx.lineTo(e, c);
       ctx.stroke();
     }
-    for (f = -0.5 + (-y + c / 2) % 50; f < c; f += 50) {
+    for (e = -0.5 + (-t + c / 2) % 50; e < c; e += 50) {
       ctx.beginPath();
-      ctx.moveTo(0, f);
-      ctx.lineTo(b, f);
+      ctx.moveTo(0, e);
+      ctx.lineTo(b, e);
       ctx.stroke();
     }
     ctx.restore();
-    r.sort(function (a, b) {
+    p.sort(function (a, b) {
       return a.size == b.size ? a.id - b.id : a.size - b.size;
     });
     ctx.save();
     ctx.translate(canvasWidth / 2, canvasHeight / 2);
     ctx.scale(zoom, zoom);
-    ctx.translate(-x, -y);
-    for (f = 0; f < E.length; f++) {
-      E[f].draw();
+    ctx.translate(-s, -t);
+    for (e = 0; e < D.length; e++) {
+      D[e].draw();
     }
-    for (f = 0; f < r.length; f++) {
-      r[f].draw();
+    for (e = 0; e < p.length; e++) {
+      p[e].draw();
     }
     ctx.restore();
-    if (renderedScoreboard && 0 != q.length) {
+    if (renderedScoreboard && 0 != w.length) {
       ctx.drawImage(renderedScoreboard, canvasWidth - renderedScoreboard.width - 10, 10);
     };
-    I = Math.max(I, Ca());
-    if (0 != I) {
-      if (null == O) {
-        O = new SizeCache(24, '#FFFFFF');
+    N = Math.max(N, Ca());
+    if (0 != N) {
+      if (null == T) {
+        T = new SizeCache(24, '#FFFFFF');
       };
-      O.setValue('Score: ' + ~~(I / 100));
-      c = O.render();
+      T.setValue('Score: ' + ~~(N / 100));
+      c = T.render();
       b = c.width;
       ctx.globalAlpha = 0.2;
       ctx.fillStyle = '#000000';
@@ -573,17 +548,17 @@
     Da();
     a = +new Date() - a;
     if (a > 1000 / 60) {
-      w -= 0.01;
+      u -= 0.01;
     } else {
       if (a < 1000 / 65) {
-        w += 0.01;
+        u += 0.01;
       };
     };
-    if (0.4 > w) {
-      w = 0.4;
+    if (0.4 > u) {
+      u = 0.4;
     };
-    if (1 < w) {
-      w = 1;
+    if (1 < u) {
+      u = 1;
     };
   }
 
@@ -598,19 +573,19 @@
   function Ca() {
     var a, b;
     a = 0;
-    for (b = 0; b < n.length; b++) {
-      a += n[b].nSize * n[b].nSize;
+    for (b = 0; b < m.length; b++) {
+      a += m[b].nSize * m[b].nSize;
     }
     return a;
   }
 
-  function na() {
+  function za() {
     var a, b, c;
-    if (0 != q.length) {
-      if (Q) {
+    if (0 != w.length) {
+      if (V) {
         renderedScoreboard = document.createElement('canvas');
         a = renderedScoreboard.getContext('2d');
-        b = 60 + 24 * q.length;
+        b = 60 + 24 * w.length;
         c = Math.min(200, 0.3 * canvasWidth) / 200;
         renderedScoreboard.width = 200 * c;
         renderedScoreboard.height = b * c;
@@ -625,13 +600,18 @@
         a.font = '30px Ubuntu';
         a.fillText(c, 100 - a.measureText(c).width / 2, 40);
         a.font = '20px Ubuntu';
-        for (b = 0; b < q.length; ++b) {
-          c = q[b].name || 'An unnamed cell';
-          if (-1 != n.indexOf(q[b].id)) {
-            c = n[0].name;
-          };
-          if (!(Q || 0 != n.length && n[0].name == c)) {
+        for (b = 0; b < w.length; ++b) {
+          c = w[b].name || 'An unnamed cell';
+          if (!V) {
             c = 'An unnamed cell';
+          };
+          if (-1 != C.indexOf(w[b].id)) {
+            if (m[0].name) {
+              c = m[0].name;
+            };
+            a.fillStyle = '#FFAAAA';
+          } else {
+            a.fillStyle = '#FFFFFF';
           };
           c = b + 1 + '. ' + c;
           a.fillText(c, 100 - a.measureText(c).width / 2, 70 + 24 * b);
@@ -643,8 +623,8 @@
   }
 
   function Cell(id, x, y, size, color, isVirus, name) {
-    r.push(this);
-    z[id] = this;
+    p.push(this);
+    v[id] = this;
     this.id = id;
     this.ox = this.x = x;
     this.oy = this.y = y;
@@ -655,13 +635,6 @@
     this.pointsAcc = [];
     this.createPoints();
     this.setName(name);
-  }
-
-  function oa(a) {
-    for (a = a.toString(16); 6 > a.length;) {
-      a = '0' + a;
-    }
-    return '#' + a;
   }
 
   function SizeCache(size, color, stroke, strokeColor) {
@@ -679,390 +652,435 @@
   if ('agar.io' != window.location.hostname && 'localhost' != window.location.hostname && '10.10.2.13' != window.location.hostname) {
     window.location = 'http://agar.io/';
   } else {
-    V = null;
-    h = null;
-    x = 0;
-    y = 0;
-    D = [];
-    n = [];
-    z = {};
-    r = [];
-    E = [];
-    q = [];
-    mouseX = 0;
-    mouseY = 0;
-    L = -1;
-    M = -1;
-    Ba = 0;
-    F = 0;
-    H = null;
-    X = 0;
-    Y = 0;
-    Z = 10000;
-    $ = 10000;
-    zoom = 1;
-    W = null;
-    sa = true;
-    Q = true;
-    hardMode = false;
-    aa = false;
-    I = 0;
-    blackTheme = false;
-    ta = false;
-    isMobile = 'ontouchstart' in window && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    ca = new Image();
-    ca.src = 'img/split.png';
-    N = null;
-    window.setNick = function (e) {
-      jQuery('#adsBottom').hide();
-      H = e;
-      ma();
-      jQuery('#overlays').hide();
+    if (window.top != window) {
+      window.top.location = 'http://agar.io/';
+    } else {
+      K = null;
+      l = null;
+      s = 0;
+      t = 0;
+      C = [];
+      m = [];
+      v = {};
+      p = [];
+      D = [];
+      w = [];
+      mouseX = 0;
+      mouseY = 0;
+      Q = -1;
+      R = -1;
+      Ba = 0;
       I = 0;
-    };
-    window.setRegion = ia;
-    window.setSkins = function (e) {
-      sa = e;
-    };
-    window.setNames = function (e) {
-      Q = e;
-    };
-    window.setDarkTheme = function (e) {
-      blackTheme = e;
-    };
-    window.setColors = function (e) {
-      hardMode = e;
-    };
-    window.setShowMass = function (e) {
-      ta = e;
-    };
-    window.connect = la;
-    qa = -1;
-    ra = -1;
-    renderedScoreboard = null;
-    w = 1;
-    O = null;
-    R = {};
-    Ea = 'poland;usa;china;russia;canada;australia;spain;brazil;germany;ukraine;france;sweden;hitler;north korea;south korea;japan;united kingdom;earth;greece;latvia;lithuania;estonia;finland;norway;cia;maldivas;austria;nigeria;reddit;yaranaika;confederate;9gag;indiana;4chan;italy;ussr;pewdiepie;bulgaria;tumblr;2ch.hk;hong kong;portugal;jamaica;german empire;mexico;sanik;switzerland;croatia;chile;indonesia;bangladesh;thailand;iran;iraq;peru;moon;botswana;bosnia;netherlands;european union;taiwan;pakistan;hungary;satanist;qing dynasty;nazi;matriarchy;patriarchy;feminism;ireland;texas;facepunch;prodota;cambodia;steam;piccolo;ea;india;kc;denmark;quebec;ayy lmao;sealand;bait;tsarist russia;origin;vinesauce;stalin;belgium;luxembourg;stussy;prussia;8ch;argentina;scotland;sir;romania;belarus;wojak;isis;doge'.split(';');
-    Fa = ['m\'blob'];
-    Cell.prototype = {
-      id: 0,
-      points: null,
-      pointsAcc: null,
-      name: null,
-      nameCache: null,
-      sizeCache: null,
-      x: 0,
-      y: 0,
-      size: 0,
-      ox: 0,
-      oy: 0,
-      oSize: 0,
-      nx: 0,
-      ny: 0,
-      nSize: 0,
-      updateTime: 0,
-      updateCode: 0,
-      drawTime: 0,
-      destroyed: false,
-      isVirus: false,
-      destroy: function () {
-        var a;
-        for (a = 0; a < r.length; a++) {
-          if (r[a] == this) {
-            r.splice(a, 1);
-            break;
+      M = null;
+      E = 0;
+      F = 0;
+      G = 10000;
+      H = 10000;
+      zoom = 1;
+      $ = null;
+      ra = true;
+      V = true;
+      hardMode = false;
+      aa = false;
+      N = 0;
+      blackTheme = false;
+      sa = false;
+      x = s = ~~((E + G) / 2);
+      y = t = ~~((F + H) / 2);
+      L = 1;
+      isMobile = 'ontouchstart' in window && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      ca = new Image();
+      ca.src = 'img/split.png';
+      S = null;
+      window.setNick = function (e) {
+        ja();
+        M = e;
+        na();
+        N = 0;
+      };
+      window.setRegion = ia;
+      window.setSkins = function (e) {
+        ra = e;
+      };
+      window.setNames = function (e) {
+        V = e;
+      };
+      window.setDarkTheme = function (e) {
+        blackTheme = e;
+      };
+      window.setColors = function (e) {
+        hardMode = e;
+      };
+      window.setShowMass = function (e) {
+        sa = e;
+      };
+      window.spectate = function (e) {
+        B(1);
+        ja();
+      };
+      window.connect = ma;
+      pa = -1;
+      qa = -1;
+      renderedScoreboard = null;
+      u = 1;
+      T = null;
+      W = {};
+      Ea = 'poland;usa;china;russia;canada;australia;spain;brazil;germany;ukraine;france;sweden;hitler;north korea;south korea;japan;united kingdom;earth;greece;latvia;lithuania;estonia;finland;norway;cia;maldivas;austria;nigeria;reddit;yaranaika;confederate;9gag;indiana;4chan;italy;ussr;pewdiepie;bulgaria;tumblr;2ch.hk;hong kong;portugal;jamaica;german empire;mexico;sanik;switzerland;croatia;chile;indonesia;bangladesh;thailand;iran;iraq;peru;moon;botswana;bosnia;netherlands;european union;taiwan;pakistan;hungary;satanist;qing dynasty;nazi;matriarchy;patriarchy;feminism;ireland;texas;facepunch;prodota;cambodia;steam;piccolo;ea;india;kc;denmark;quebec;ayy lmao;sealand;bait;tsarist russia;origin;vinesauce;stalin;belgium;luxembourg;stussy;prussia;8ch;argentina;scotland;sir;romania;belarus;wojak;isis;doge;nasa;byzantium;imperial japan;kingdom of france;somalia;turkey;mars;pokerface'.split(';');
+      Fa = ['m\'blob'];
+      Cell.prototype = {
+        id: 0,
+        points: null,
+        pointsAcc: null,
+        name: null,
+        nameCache: null,
+        sizeCache: null,
+        x: 0,
+        y: 0,
+        size: 0,
+        ox: 0,
+        oy: 0,
+        oSize: 0,
+        nx: 0,
+        ny: 0,
+        nSize: 0,
+        updateTime: 0,
+        updateCode: 0,
+        drawTime: 0,
+        destroyed: false,
+        isVirus: false,
+        destroy: function () {
+          var a;
+          for (a = 0; a < p.length; a++) {
+            if (p[a] == this) {
+              p.splice(a, 1);
+              break;
+            }
           }
-        }
-        delete z[this.id];
-        a = n.indexOf(this);
-        if (-1 != a) {
-          aa = true;
-          n.splice(a, 1);
-        };
-        a = D.indexOf(this.id);
-        if (-1 != a) {
-          D.splice(a, 1);
-        };
-        this.destroyed = true;
-        E.push(this);
-      },
-      getNameSize: function () {
-        return Math.max(~~(0.3 * this.size), 24);
-      },
-      setName: function (a) {
-        if (this.name = a) {
-          if (null == this.nameCache) {
-            this.nameCache = new SizeCache(this.getNameSize(), '#FFFFFF', true, '#000000');
-          } else {
-            this.nameCache.setSize(this.getNameSize());
+          delete v[this.id];
+          a = m.indexOf(this);
+          if (-1 != a) {
+            aa = true;
+            m.splice(a, 1);
           };
-          this.nameCache.setValue(this.name);
-        }
-      },
-      createPoints: function () {
-        var a, b, c;
-        for (a = this.getNumPoints(); this.points.length > a;) {
-          b = ~~(Math.random() * this.points.length);
-          this.points.splice(b, 1);
-          this.pointsAcc.splice(b, 1);
-        }
-        if (0 == this.points.length && 0 < a) {
-          this.points.push({
-            c: this,
-            v: this.size,
-            x: this.x,
-            y: this.y
-          });
-          this.pointsAcc.push(Math.random() - 0.5);
-        };
-        for (; this.points.length < a;) {
-          b = ~~(Math.random() * this.points.length);
-          c = this.points[b];
-          this.points.splice(b, 0, {
-            c: this,
-            v: c.v,
-            x: c.x,
-            y: c.y
-          });
-          this.pointsAcc.splice(b, 0, this.pointsAcc[b]);
-        }
-      },
-      getNumPoints: function () {
-        return ~~Math.max(this.size * zoom * (this.isVirus ? Math.min(2 * w, 1) : w), this.isVirus ? 10 : 5);
-      },
-      movePoints: function () {
-        var a, b, c, d, e, g, h, k, l, m, n, p;
-        this.createPoints();
-        a = this.points;
-        b = this.pointsAcc;
-        c = b.concat();
-        d = a.concat();
-        g = d.length;
-        for (e = 0; e < g; ++e) {
-          h = c[(e - 1 + g) % g];
-          l = c[(e + 1) % g];
-          b[e] += Math.random() - 0.5;
-          b[e] *= 0.7;
-          if (10 < b[e]) {
-            b[e] = 10;
+          a = C.indexOf(this.id);
+          if (-1 != a) {
+            C.splice(a, 1);
           };
-          if (-10 > b[e]) {
-            b[e] = -10;
-          };
-          b[e] = (h + l + 8 * b[e]) / 10;
-        }
-        n = this;
-        for (e = 0; e < g; ++e) {
-          c = d[e].v;
-          h = d[(e - 1 + g) % g].v;
-          l = d[(e + 1) % g].v;
-          if (15 < this.size) {
-            m = false;
-            k = a[e].x;
-            p = a[e].y;
-            V.retrieve2(k - 5, p - 5, 10, 10, function (a) {
-              if (a.c != n && 25 > (k - a.x) * (k - a.x) + (p - a.y) * (p - a.y)) {
-                m = true;
-              };
-            });
-            if (!m && (a[e].x < X || a[e].y < Y || a[e].x > Z || a[e].y > $)) {
-              m = true;
-            };
-            if (m) {
-              if (0 < b[e]) {
-                b[e] = 0;
-              };
-              b[e] -= 1;
-            };
-          }
-          c += b[e];
-          if (0 > c) {
-            c = 0;
-          };
-          c = (12 * c + this.size) / 13;
-          a[e].v = (h + l + 8 * c) / 10;
-          h = 2 * Math.PI / g;
-          l = this.points[e].v;
-          if (this.isVirus && 0 == e % 2) {
-            l += 5;
-          };
-          a[e].x = this.x + Math.cos(h * e) * l;
-          a[e].y = this.y + Math.sin(h * e) * l;
-        }
-      },
-      updatePos: function () {
-        var a, b, c;
-        a = (F - this.updateTime) / 120;
-        a = 0 > a ? 0 : 1 < a ? 1 : a;
-        a = a * a * (3 - 2 * a);
-        b = this.getNameSize();
-        if (this.destroyed && 1 <= a) {
-          c = E.indexOf(this);
-          if (-1 != c) {
-            E.splice(c, 1);
-          };
-        }
-        this.x = a * (this.nx - this.ox) + this.ox;
-        this.y = a * (this.ny - this.oy) + this.oy;
-        this.size = a * (this.nSize - this.oSize) + this.oSize;
-        if (!(this.destroyed || b == this.getNameSize())) {
-          this.setName(this.name);
-        };
-        return a;
-      },
-      shouldRender: function () {
-        return this.x + this.size + 40 < x - canvasWidth / 2 / zoom || this.y + this.size + 40 < y - canvasHeight / 2 / zoom || this.x - this.size - 40 > x + canvasWidth / 2 / zoom || this.y - this.size - 40 > y + canvasHeight / 2 / zoom ? false : true;
-      },
-      draw: function () {
-        var a, b, c;
-        if (this.shouldRender()) {
-          ctx.save();
-          this.drawTime = F;
-          a = this.updatePos();
-          if (this.destroyed) {
-            ctx.globalAlpha *= 1 - a;
-          };
-          this.movePoints();
-          if (hardMode) {
-            ctx.fillStyle = '#FFFFFF';
-            ctx.strokeStyle = '#AAAAAA';
-          } else {
-            ctx.fillStyle = this.color;
-            ctx.strokeStyle = this.color;
-          };
-          ctx.beginPath();
-          ctx.lineWidth = 10;
-          ctx.lineCap = 'round';
-          ctx.lineJoin = this.isVirus ? 'mitter' : 'round';
-          a = this.getNumPoints();
-          ctx.moveTo(this.points[0].x, this.points[0].y);
-          for (b = 1; b <= a; ++b) {
-            c = b % a;
-            ctx.lineTo(this.points[c].x, this.points[c].y);
-          }
-          ctx.closePath();
-          a = this.name.toLowerCase();
-          if (sa) {
-            if (-1 != Ea.indexOf(a)) {
-              if (!R.hasOwnProperty(a)) {
-                R[a] = new Image();
-                R[a].src = 'skins/' + a + '.png';
-              };
-              b = R[a];
+          this.destroyed = true;
+          D.push(this);
+        },
+        getNameSize: function () {
+          return Math.max(~~(0.3 * this.size), 24);
+        },
+        setName: function (a) {
+          if (this.name = a) {
+            if (null == this.nameCache) {
+              this.nameCache = new SizeCache(this.getNameSize(), '#FFFFFF', true, '#000000');
             } else {
-              b = null;
+              this.nameCache.setSize(this.getNameSize());
             };
-          } else {
-            b = null;
-          };
-          a = b ? -1 != Fa.indexOf(a) : false;
-          ctx.stroke();
-          ctx.fill();
-          if (null != b && 0 < b.width && !a) {
-            ctx.save();
-            ctx.clip();
-            ctx.drawImage(b, this.x - this.size, this.y - this.size, 2 * this.size, 2 * this.size);
-            ctx.restore();
-          };
-          if (hardMode || 15 < this.size) {
-            ctx.strokeStyle = '#000000';
-            ctx.globalAlpha *= 0.1;
-            ctx.stroke();
+            this.nameCache.setValue(this.name);
           }
-          ctx.globalAlpha = 1;
-          if (null != b && 0 < b.width && a) {
-            ctx.drawImage(b, this.x - 2 * this.size, this.y - 2 * this.size, 4 * this.size, 4 * this.size);
+        },
+        createPoints: function () {
+          var a, b, c;
+          for (a = this.getNumPoints(); this.points.length > a;) {
+            b = ~~(Math.random() * this.points.length);
+            this.points.splice(b, 1);
+            this.pointsAcc.splice(b, 1);
+          }
+          if (0 == this.points.length && 0 < a) {
+            this.points.push({
+              c: this,
+              v: this.size,
+              x: this.x,
+              y: this.y
+            });
+            this.pointsAcc.push(Math.random() - 0.5);
           };
-          a = -1 != n.indexOf(this);
-          b = ~~this.y;
-          if ((Q || a) && this.name && this.nameCache) {
-            c = this.nameCache.render();
-            ctx.drawImage(c, ~~this.x - ~~(c.width / 2), b - ~~(c.height / 2));
-            b += c.height / 2 + 4;
+          for (; this.points.length < a;) {
+            b = ~~(Math.random() * this.points.length);
+            c = this.points[b];
+            this.points.splice(b, 0, {
+              c: this,
+              v: c.v,
+              x: c.x,
+              y: c.y
+            });
+            this.pointsAcc.splice(b, 0, this.pointsAcc[b]);
+          }
+        },
+        getNumPoints: function () {
+          var a;
+          a = 10;
+          if (20 > this.size) {
+            a = 5;
           };
-          if (ta && a) {
-            if (null == this.sizeCache) {
-              this.sizeCache = new SizeCache(this.getNameSize() / 2, '#FFFFFF', true, '#000000');
+          if (this.isVirus) {
+            a = 30;
+          };
+          return ~~Math.max(this.size * zoom * (this.isVirus ? Math.min(2 * u, 1) : u), a);
+        },
+        movePoints: function () {
+          var a, b, c, d, e, f, g, h, k, l, m, n;
+          this.createPoints();
+          a = this.points;
+          b = this.pointsAcc;
+          c = b.concat();
+          e = a.concat();
+          d = e.length;
+          for (f = 0; f < d; ++f) {
+            g = c[(f - 1 + d) % d];
+            h = c[(f + 1) % d];
+            b[f] += Math.random() - 0.5;
+            b[f] *= 0.7;
+            if (10 < b[f]) {
+              b[f] = 10;
             };
-            this.sizeCache.setSize(this.getNameSize() / 2);
-            this.sizeCache.setValue(~~(this.size * this.size / 100));
-            c = this.sizeCache.render();
-            ctx.drawImage(c, ~~this.x - ~~(c.width / 2), b - ~~(c.height / 2));
-          };
-          ctx.restore();
+            if (-10 > b[f]) {
+              b[f] = -10;
+            };
+            b[f] = (g + h + 8 * b[f]) / 10;
+          }
+          k = this;
+          for (f = 0; f < d; ++f) {
+            c = e[f].v;
+            g = e[(f - 1 + d) % d].v;
+            h = e[(f + 1) % d].v;
+            if (15 < this.size && null != K) {
+              l = false;
+              n = a[f].x;
+              m = a[f].y;
+              K.retrieve2(n - 5, m - 5, 10, 10, function (a) {
+                if (a.c != k && 25 > (n - a.x) * (n - a.x) + (m - a.y) * (m - a.y)) {
+                  l = true;
+                };
+              });
+              if (!l && (a[f].x < E || a[f].y < F || a[f].x > G || a[f].y > H)) {
+                l = true;
+              };
+              if (l) {
+                if (0 < b[f]) {
+                  b[f] = 0;
+                };
+                b[f] -= 1;
+              };
+            }
+            c += b[f];
+            if (0 > c) {
+              c = 0;
+            };
+            c = (12 * c + this.size) / 13;
+            a[f].v = (g + h + 8 * c) / 10;
+            g = 2 * Math.PI / d;
+            h = this.points[f].v;
+            if (this.isVirus && 0 == f % 2) {
+              h += 5;
+            };
+            a[f].x = this.x + Math.cos(g * f) * h;
+            a[f].y = this.y + Math.sin(g * f) * h;
+          }
+        },
+        updatePos: function () {
+          var a, b;
+          a = (I - this.updateTime) / 120;
+          a = 0 > a ? 0 : 1 < a ? 1 : a;
+          a = a * a * (3 - 2 * a);
+          this.getNameSize();
+          if (this.destroyed && 1 <= a) {
+            b = D.indexOf(this);
+            if (-1 != b) {
+              D.splice(b, 1);
+            };
+          }
+          this.x = a * (this.nx - this.ox) + this.ox;
+          this.y = a * (this.ny - this.oy) + this.oy;
+          this.size = a * (this.nSize - this.oSize) + this.oSize;
+          return a;
+        },
+        shouldRender: function () {
+          return this.x + this.size + 40 < s - canvasWidth / 2 / zoom || this.y + this.size + 40 < t - canvasHeight / 2 / zoom || this.x - this.size - 40 > s + canvasWidth / 2 / zoom || this.y - this.size - 40 > t + canvasHeight / 2 / zoom ? false : true;
+        },
+        draw: function () {
+          var a, b, c, e, f, h;
+          if (this.shouldRender()) {
+            a = !this.isVirus && 0.5 > zoom;
+            ctx.save();
+            this.drawTime = I;
+            b = this.updatePos();
+            if (this.destroyed) {
+              ctx.globalAlpha *= 1 - b;
+            };
+            ctx.lineWidth = 10;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = this.isVirus ? 'mitter' : 'round';
+            if (hardMode) {
+              ctx.fillStyle = '#FFFFFF';
+              ctx.strokeStyle = '#AAAAAA';
+            } else {
+              ctx.fillStyle = this.color;
+              ctx.strokeStyle = this.color;
+            };
+            if (a) {
+              ctx.beginPath();
+              ctx.arc(this.x, this.y, this.size, 0, 2 * Math.PI, false);
+            } else {
+              this.movePoints();
+              ctx.beginPath();
+              b = this.getNumPoints();
+              ctx.moveTo(this.points[0].x, this.points[0].y);
+              for (c = 1; c <= b; ++c) {
+                e = c % b;
+                ctx.lineTo(this.points[e].x, this.points[e].y);
+              }
+            }
+            ctx.closePath();
+            b = this.name.toLowerCase();
+            if (ra) {
+              if (-1 != Ea.indexOf(b)) {
+                if (!W.hasOwnProperty(b)) {
+                  W[b] = new Image();
+                  W[b].src = 'skins/' + b + '.png';
+                };
+                c = W[b];
+              } else {
+                c = null;
+              };
+            } else {
+              c = null;
+            };
+            b = c ? -1 != Fa.indexOf(b) : false;
+            if (!a) {
+              ctx.stroke();
+            };
+            ctx.fill();
+            if (null != c && 0 < c.width && !b) {
+              ctx.save();
+              ctx.clip();
+              ctx.drawImage(c, this.x - this.size, this.y - this.size, 2 * this.size, 2 * this.size);
+              ctx.restore();
+            };
+            if ((hardMode || 15 < this.size) && !a) {
+              ctx.strokeStyle = '#000000';
+              ctx.globalAlpha *= 0.1;
+              ctx.stroke();
+            };
+            ctx.globalAlpha = 1;
+            if (null != c && 0 < c.width && b) {
+              ctx.drawImage(c, this.x - 2 * this.size, this.y - 2 * this.size, 4 * this.size, 4 * this.size);
+            };
+            c = -1 != m.indexOf(this);
+            a = ~~this.y;
+            if ((V || c) && this.name && this.nameCache) {
+              e = this.nameCache;
+              e.setValue(this.name);
+              e.setSize(this.getNameSize());
+              b = Math.ceil(10 * zoom) / 10;
+              e.setScale(b);
+              e = e.render();
+              h = ~~(e.width / b);
+              f = ~~(e.height / b);
+              ctx.drawImage(e, ~~this.x - ~~(h / 2), a - ~~(f / 2), h, f);
+              a += e.height / 2 / b + 4;
+            }
+            if (sa && c) {
+              if (null == this.sizeCache) {
+                this.sizeCache = new SizeCache(this.getNameSize() / 2, '#FFFFFF', true, '#000000');
+              };
+              c = this.sizeCache;
+              c.setSize(this.getNameSize() / 2);
+              c.setValue(~~(this.size * this.size / 100));
+              b = Math.ceil(10 * zoom) / 10;
+              c.setScale(b);
+              e = c.render();
+              h = ~~(e.width / b);
+              f = ~~(e.height / b);
+              ctx.drawImage(e, ~~this.x - ~~(h / 2), a - ~~(f / 2), h, f);
+            };
+            ctx.restore();
+          }
         }
-      }
-    };
-    SizeCache.prototype = {
-      _value: '',
-      _color: '#000000',
-      _stroke: false,
-      _strokeColor: '#000000',
-      _size: 16,
-      _canvas: null,
-      _ctx: null,
-      _dirty: false,
-      setSize: function (a) {
-        if (this._size != a) {
-          this._size = a;
-          this._dirty = true;
-        };
-      },
-      setColor: function (a) {
-        if (this._color != a) {
-          this._color = a;
-          this._dirty = true;
-        };
-      },
-      setStroke: function (a) {
-        if (this._stroke != a) {
-          this._stroke = a;
-          this._dirty = true;
-        };
-      },
-      setStrokeColor: function (a) {
-        if (this._strokeColor != a) {
-          this._strokeColor = a;
-          this._dirty = true;
-        };
-      },
-      setValue: function (a) {
-        if (a != this._value) {
-          this._value = a;
-          this._dirty = true;
-        };
-      },
-      render: function () {
-        var a, b, c, d, e, g, h;
-        if (null == this._canvas) {
-          this._canvas = document.createElement('canvas');
-          this._ctx = this._canvas.getContext('2d');
-        };
-        if (this._dirty) {
-          a = this._canvas;
-          b = this._ctx;
-          c = this._value;
-          d = this._size;
-          g = d + 'px Ubuntu';
-          b.font = g;
-          e = b.measureText(c).width;
-          h = ~~(0.2 * d);
-          a.width = e + 6;
-          a.height = d + h;
-          b.font = g;
-          b.globalAlpha = 1;
-          b.lineWidth = 3;
-          b.strokeStyle = this._strokeColor;
-          b.fillStyle = this._color;
-          if (this._stroke) {
-            b.strokeText(c, 3, d - h / 2);
+      };
+      SizeCache.prototype = {
+        _value: '',
+        _color: '#000000',
+        _stroke: false,
+        _strokeColor: '#000000',
+        _size: 16,
+        _canvas: null,
+        _ctx: null,
+        _dirty: false,
+        _scale: 1,
+        setSize: function (a) {
+          if (this._size != a) {
+            this._size = a;
+            this._dirty = true;
           };
-          b.fillText(c, 3, d - h / 2);
+        },
+        setScale: function (a) {
+          if (this._scale != a) {
+            this._scale = a;
+            this._dirty = true;
+          };
+        },
+        setColor: function (a) {
+          if (this._color != a) {
+            this._color = a;
+            this._dirty = true;
+          };
+        },
+        setStroke: function (a) {
+          if (this._stroke != a) {
+            this._stroke = a;
+            this._dirty = true;
+          };
+        },
+        setStrokeColor: function (a) {
+          if (this._strokeColor != a) {
+            this._strokeColor = a;
+            this._dirty = true;
+          };
+        },
+        setValue: function (a) {
+          if (a != this._value) {
+            this._value = a;
+            this._dirty = true;
+          };
+        },
+        render: function () {
+          var a, b, c, d, f, g, h, k;
+          if (null == this._canvas) {
+            this._canvas = document.createElement('canvas');
+            this._ctx = this._canvas.getContext('2d');
+          };
+          if (this._dirty) {
+            this._dirty = false;
+            a = this._canvas;
+            b = this._ctx;
+            c = this._value;
+            d = this._scale;
+            g = this._size;
+            f = g + 'px Ubuntu';
+            b.font = f;
+            h = b.measureText(c).width;
+            k = ~~(0.2 * g);
+            a.width = (h + 6) * d;
+            a.height = (g + k) * d;
+            b.font = f;
+            b.scale(d, d);
+            b.globalAlpha = 1;
+            b.lineWidth = 3;
+            b.strokeStyle = this._strokeColor;
+            b.fillStyle = this._color;
+            if (this._stroke) {
+              b.strokeText(c, 3, g - k / 2);
+            };
+            b.fillText(c, 3, g - k / 2);
+          }
+          return this._canvas;
         }
-        return this._canvas;
-      }
-    };
-    window.onload = init;
+      };
+      window.onload = init;
+    }
   }
 }(window, jQuery));

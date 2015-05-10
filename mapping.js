@@ -48,5 +48,29 @@
     'ua': 'init',
     'Aa': 'calculateZoom',
     'n': 'myCells'
+  },
+  371794875: {
+    'h': 'window',
+    'r': 'jQuery',
+    'ea': 'refreshRegionInfo',
+    'X': '_canvas',
+    'A': 'canvas',
+    'd': 'ctx',
+    'O': 'mouseX',
+    'P': 'mouseY',
+    'ga': 'onResize',
+    'Z': 'draw',
+    'J': 'sendTargetUpdate',
+    'ua': 'think',
+    'k': 'canvasWidth',
+    'q': 'canvasHeight',
+    'ba': 'blackTheme',
+    'g': 'zoom',
+    'z': 'renderedScoreboard',
+    'oa': 'Cell',
+    'U': 'SizeCache',
+    'fa': 'isMobile',
+    'da': 'hardMode',
+    'ta': 'init'
   }
 }));

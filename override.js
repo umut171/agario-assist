@@ -1,6 +1,3 @@
-// Wrap everything in a try catch so that things continue working if we get lucky
-try {
-
 // Scroll to change zoom  (down = zoom out, up = zoom in)
 calculateZoom = function () {};
 zoom = 1;
@@ -41,9 +38,3 @@ Cell.prototype.shouldRender = function () {
 
 // Finally, start the whole process
 init();
-$ = jQuery;
-
-} catch (e) {
-  // Something went wrong... let's just make sure the game loads
-  ORIGINAL_LOAD();
-}
