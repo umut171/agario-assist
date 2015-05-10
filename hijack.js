@@ -9,24 +9,30 @@ window.onload = (function (fallback) {
     // The slices are to remove the "return" from the check at the top
     SIG = hash(data);
     data = ~data.indexOf("DOUBLE_BUFFER") ? data.slice(20,173) + data.slice(180,-18) : data.slice(15,-18);
-    var s, js = data + ";document.currentScript.parentNode.removeChild(document.currentScript)";
-
-    // Load the game
-    s = document.createElement("script");
-    s.appendChild(document.createTextNode(js));
-    document.body.appendChild(s);
+    var js = data + ";document.currentScript.parentNode.removeChild(document.currentScript)";
 
     // Unobfusicate the game
-    s = document.createElement("script");
-    s.onload = function () { this.parentNode.removeChild(this); };
-    s.src = mappingURL;
-    document.body.appendChild(s);
+    setTimeout(function () {
+        var s = document.createElement("script");
+        s.onload = function () { this.parentNode.removeChild(this); };
+        s.src = mappingURL;
+        document.body.appendChild(s);
+    }, 10);
+
+    // Load the game
+    setTimeout(function () {
+        var s = document.createElement("script");
+        s.appendChild(document.createTextNode(js));
+        document.body.appendChild(s);
+    }, 20);
 
     // Override the game
-    s = document.createElement("script");
-    s.onload = function () { this.parentNode.removeChild(this); };
-    s.src = overrideURL;
-    document.body.appendChild(s);
+    setTimeout(function () {
+        var s = document.createElement("script");
+        s.onload = function () { this.parentNode.removeChild(this); };
+        s.src = overrideURL;
+        document.body.appendChild(s);
+    }, 30);
   }, ORIGINAL_LOAD);
 }).bind(null, window.onload);
 

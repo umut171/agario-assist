@@ -1,5 +1,5 @@
 (function (window, jQuery) {
-  var $, Ba, D, E, Ea, F, Fa, H, I, J, K, L, M, O, P, V, W, X, Y, Z, _canvas, aa, blackTheme, ca, canvas, canvasHeight, canvasWidth, ctx, h, hardMode, isMobile, m, mouseX, mouseY, pa, q, qa, r, ra, renderedScoreboard, sa, w, x, y, z, zoom;
+  var $, Ba, D, E, Ea, F, Fa, H, I, L, M, N, O, Q, R, V, W, X, Y, Z, _canvas, aa, blackTheme, ca, canvas, canvasHeight, canvasWidth, ctx, h, hardMode, isMobile, mouseX, mouseY, n, q, qa, r, ra, renderedScoreboard, sa, ta, w, x, y, z, zoom;
 
   function init() {
     var a, b, c;
@@ -106,26 +106,26 @@
   }
 
   function T() {
-    J = (mouseX - canvasWidth / 2) / zoom + w;
-    K = (mouseY - canvasHeight / 2) / zoom + x;
+    L = (mouseX - canvasWidth / 2) / zoom + x;
+    M = (mouseY - canvasHeight / 2) / zoom + y;
   }
 
   function refreshRegionInfo() {
-    if (null == L) {
-      L = {};
+    if (null == N) {
+      N = {};
       jQuery('#region').children().each(function () {
         var a, b;
         a = jQuery(this);
         b = a.val();
         if (b) {
-          L[b] = a.text();
+          N[b] = a.text();
         };
       });
     };
     jQuery.get('http://m.agar.io/info', function (a) {
       var b;
       for (b in a.regions) {
-        jQuery('#region option[value="' + b + '"]').text(L[b] + ' (' + a.regions[b].numPlayers + ' players)');
+        jQuery('#region option[value="' + b + '"]').text(N[b] + ' (' + a.regions[b].numPlayers + ' players)');
       }
     }, 'json');
   }
@@ -168,23 +168,23 @@
       h = null;
     };
     D = [];
-    m = [];
-    y = {};
+    n = [];
+    z = {};
     r = [];
     E = [];
-    z = [];
+    q = [];
     console.log('Connecting to ' + a);
     h = new WebSocket(a);
     h.binaryType = 'arraybuffer';
-    h.onopen = va;
-    h.onmessage = wa;
-    h.onclose = xa;
+    h.onopen = wa;
+    h.onmessage = xa;
+    h.onclose = ya;
     h.onerror = function (e) {
       console.log('socket error');
     };
   }
 
-  function va(a) {
+  function wa(a) {
     var b;
     jQuery('#connecting').hide();
     console.log('socket open');
@@ -196,13 +196,13 @@
     ma();
   }
 
-  function xa(a) {
+  function ya(a) {
     console.log('socket close');
     setTimeout(ja, 500);
   }
 
-  function wa(a) {
-    var c, f;
+  function xa(a) {
+    var c, d, e, f;
 
     function b() {
       var a, b;
@@ -220,35 +220,52 @@
     f = new DataView(a.data);
     switch (f.getUint8(0)) {
     case 16:
-      ya(f);
+      za(f);
       break;
     case 20:
-      m = [];
+      n = [];
       D = [];
       break;
     case 32:
       D.push(f.getUint32(1, true));
       break;
     case 48:
-      for (z = []; c < f.byteLength;) {
-        z.push(b());
+      for (q = []; c < f.byteLength;) {
+        q.push({
+          id: 0,
+          name: b()
+        });
       }
-      za();
+      na();
+      break;
+    case 49:
+      a = f.getUint32(c, true);
+      c += 4;
+      q = [];
+      for (d = 0; d < a; ++d) {
+        e = f.getUint32(c, true);
+        c = c + 4;
+        q.push({
+          id: e,
+          name: b()
+        });
+      }
+      na();
       break;
     case 64:
       X = f.getFloat64(1, true);
       Y = f.getFloat64(9, true);
       Z = f.getFloat64(17, true);
       $ = f.getFloat64(25, true);
-      if (0 == m.length) {
-        w = (Z + X) / 2;
-        x = ($ + Y) / 2;
+      if (0 == n.length) {
+        x = (Z + X) / 2;
+        y = ($ + Y) / 2;
       };
     }
   }
 
-  function ya(a) {
-    var b, c, d, e, f, g, h, k, l, n, p, q, s, t, u;
+  function za(a) {
+    var b, c, d, e, f, g, h, k, l, m, p, q, s, t, u;
     F = +new Date();
     b = Math.random();
     c = 1;
@@ -256,8 +273,8 @@
     f = a.getUint16(c, true);
     c = c + 2;
     for (d = 0; d < f; ++d) {
-      e = y[a.getUint32(c, true)];
-      t = y[a.getUint32(c + 4, true)];
+      e = z[a.getUint32(c, true)];
+      t = z[a.getUint32(c + 4, true)];
       c = c + 8;
       if (e && t) {
         t.destroy();
@@ -292,7 +309,7 @@
           h = a.getUint8(c++);
           l = a.getUint8(c++);
           g = a.getUint8(c++);
-          l = na(h << 16 | l << 8 | g);
+          l = oa(h << 16 | l << 8 | g);
           g = a.getUint8(c++);
           h = !!(g & 1);
           if (g & 2) {
@@ -307,23 +324,23 @@
         } else {
           l = 63487 | l << 16;
           k = (l >> 16 & 255) / 255 * 360;
-          n = (l >> 8 & 255) / 255;
+          m = (l >> 8 & 255) / 255;
           l = (l >> 0 & 255) / 255;
-          if (0 == n) {
+          if (0 == m) {
             l = l << 16 | l << 8 | l << 0;
           } else {
             k = k / 60;
             g = ~~k;
             u = k - g;
-            k = l * (1 - n);
-            s = l * (1 - n * u);
-            n = l * (1 - n * (1 - u));
+            k = l * (1 - m);
+            s = l * (1 - m * u);
+            m = l * (1 - m * (1 - u));
             p = u = 0;
             q = 0;
             switch (g % 6) {
             case 0:
               u = l;
-              p = n;
+              p = m;
               q = k;
               break;
             case 1:
@@ -334,7 +351,7 @@
             case 2:
               u = k;
               p = l;
-              q = n;
+              q = m;
               break;
             case 3:
               u = k;
@@ -342,7 +359,7 @@
               q = l;
               break;
             case 4:
-              u = n;
+              u = m;
               p = k;
               q = l;
               break;
@@ -356,7 +373,7 @@
             q = ~~(255 * q) & 255;
             l = u << 16 | p << 8 | q;
           }
-          l = na(l);
+          l = oa(l);
         }
       }
       for (g = '';;) {
@@ -368,8 +385,8 @@
         g += String.fromCharCode(k);
       }
       k = null;
-      if (y.hasOwnProperty(f)) {
-        k = y[f];
+      if (z.hasOwnProperty(f)) {
+        k = z[f];
         k.updatePos();
         k.ox = k.x;
         k.oy = k.y;
@@ -385,12 +402,12 @@
       k.nSize = t;
       k.updateCode = b;
       k.updateTime = F;
-      if (-1 != D.indexOf(f) && -1 == m.indexOf(k)) {
+      if (-1 != D.indexOf(f) && -1 == n.indexOf(k)) {
         document.getElementById('overlays').style.display = 'none';
-        m.push(k);
-        if (1 == m.length) {
-          w = k.x;
-          x = k.y;
+        n.push(k);
+        if (1 == n.length) {
+          x = k.x;
+          y = k.y;
         };
       };
     }
@@ -401,8 +418,8 @@
     for (d = 0; d < e; d++) {
       f = a.getUint32(c, true);
       c += 4;
-      if (y[f]) {
-        y[f].updateCode = b;
+      if (z[f]) {
+        z[f].updateCode = b;
       };
     }
     for (d = 0; d < r.length; d++) {
@@ -410,23 +427,27 @@
         r[d--].destroy();
       };
     }
-    if (aa && 0 == m.length) {
+    if (aa && 0 == n.length) {
       jQuery('#overlays').fadeIn(3000);
     };
   }
 
   function sendTargetUpdate() {
     var a, b;
-    if (null != h && h.readyState == h.OPEN && (pa != J || qa != K)) {
-      pa = J;
-      qa = K;
-      a = new ArrayBuffer(21);
-      b = new DataView(a);
-      b.setUint8(0, 16);
-      b.setFloat64(1, J, true);
-      b.setFloat64(9, K, true);
-      b.setUint32(17, 0, true);
-      h.send(a);
+    if (null != h && h.readyState == h.OPEN) {
+      a = mouseX - canvasWidth / 2;
+      b = mouseY - canvasHeight / 2;
+      if (!(64 > a * a + b * b || qa == L && ra == M)) {
+        qa = L;
+        ra = M;
+        a = new ArrayBuffer(21);
+        b = new DataView(a);
+        b.setUint8(0, 16);
+        b.setFloat64(1, L, true);
+        b.setFloat64(9, M, true);
+        b.setUint32(17, 0, true);
+        h.send(a);
+      };
     }
   }
 
@@ -467,12 +488,14 @@
 
   function calculateZoom() {
     var b, sizeFactor;
-    sizeFactor = 0;
-    for (b = 0; b < m.length; b++) {
-      sizeFactor += m[b].size;
+    if (0 != n.length) {
+      sizeFactor = 0;
+      for (b = 0; b < n.length; b++) {
+        sizeFactor += n[b].size;
+      }
+      sizeFactor = Math.pow(Math.min(64 / sizeFactor, 1), 0.4) * Math.max(canvasHeight / 965, canvasWidth / 1920);
+      zoom = (9 * zoom + sizeFactor) / 10;
     }
-    sizeFactor = Math.pow(Math.min(64 / sizeFactor, 1), 0.4) * Math.max(canvasHeight / 965, canvasWidth / 1920);
-    zoom = (9 * zoom + sizeFactor) / 10;
   }
 
   function draw() {
@@ -481,18 +504,18 @@
     ++Ba;
     calculateZoom();
     F = +new Date();
-    think();
-    if (0 < m.length) {
+    if (0 < n.length) {
       b = 0;
       c = 0;
-      for (f = 0; f < m.length; f++) {
-        m[f].updatePos();
-        b += m[f].x / m.length;
-        c += m[f].y / m.length;
+      for (f = 0; f < n.length; f++) {
+        n[f].updatePos();
+        b += n[f].x / n.length;
+        c += n[f].y / n.length;
       }
-      w = (w + b) / 2;
-      x = (x + c) / 2;
+      x = (x + b) / 2;
+      y = (y + c) / 2;
     }
+    think();
     T();
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
     ctx.fillStyle = blackTheme ? '#111111' : '#F2FBFF';
@@ -503,13 +526,13 @@
     ctx.scale(zoom, zoom);
     b = canvasWidth / zoom;
     c = canvasHeight / zoom;
-    for (f = -0.5 + (-w + b / 2) % 50; f < b; f += 50) {
+    for (f = -0.5 + (-x + b / 2) % 50; f < b; f += 50) {
       ctx.beginPath();
       ctx.moveTo(f, 0);
       ctx.lineTo(f, c);
       ctx.stroke();
     }
-    for (f = -0.5 + (-x + c / 2) % 50; f < c; f += 50) {
+    for (f = -0.5 + (-y + c / 2) % 50; f < c; f += 50) {
       ctx.beginPath();
       ctx.moveTo(0, f);
       ctx.lineTo(b, f);
@@ -522,7 +545,7 @@
     ctx.save();
     ctx.translate(canvasWidth / 2, canvasHeight / 2);
     ctx.scale(zoom, zoom);
-    ctx.translate(-w, -x);
+    ctx.translate(-x, -y);
     for (f = 0; f < E.length; f++) {
       E[f].draw();
     }
@@ -530,16 +553,16 @@
       r[f].draw();
     }
     ctx.restore();
-    if (renderedScoreboard && 0 != z.length) {
+    if (renderedScoreboard && 0 != q.length) {
       ctx.drawImage(renderedScoreboard, canvasWidth - renderedScoreboard.width - 10, 10);
     };
     I = Math.max(I, Ca());
     if (0 != I) {
-      if (null == M) {
-        M = new SizeCache(24, '#FFFFFF');
+      if (null == O) {
+        O = new SizeCache(24, '#FFFFFF');
       };
-      M.setValue('Score: ' + ~~(I / 100));
-      c = M.render();
+      O.setValue('Score: ' + ~~(I / 100));
+      c = O.render();
       b = c.width;
       ctx.globalAlpha = 0.2;
       ctx.fillStyle = '#000000';
@@ -550,17 +573,17 @@
     Da();
     a = +new Date() - a;
     if (a > 1000 / 60) {
-      q -= 0.01;
+      w -= 0.01;
     } else {
       if (a < 1000 / 65) {
-        q += 0.01;
+        w += 0.01;
       };
     };
-    if (0.4 > q) {
-      q = 0.4;
+    if (0.4 > w) {
+      w = 0.4;
     };
-    if (1 < q) {
-      q = 1;
+    if (1 < w) {
+      w = 1;
     };
   }
 
@@ -575,19 +598,19 @@
   function Ca() {
     var a, b;
     a = 0;
-    for (b = 0; b < m.length; b++) {
-      a += m[b].nSize * m[b].nSize;
+    for (b = 0; b < n.length; b++) {
+      a += n[b].nSize * n[b].nSize;
     }
     return a;
   }
 
-  function za() {
+  function na() {
     var a, b, c;
-    if (0 != z.length) {
-      if (O) {
+    if (0 != q.length) {
+      if (Q) {
         renderedScoreboard = document.createElement('canvas');
         a = renderedScoreboard.getContext('2d');
-        b = 60 + 24 * z.length;
+        b = 60 + 24 * q.length;
         c = Math.min(200, 0.3 * canvasWidth) / 200;
         renderedScoreboard.width = 200 * c;
         renderedScoreboard.height = b * c;
@@ -602,9 +625,12 @@
         a.font = '30px Ubuntu';
         a.fillText(c, 100 - a.measureText(c).width / 2, 40);
         a.font = '20px Ubuntu';
-        for (b = 0; b < z.length; ++b) {
-          c = z[b] || 'An unnamed cell';
-          if (!(O || 0 != m.length && m[0].name == c)) {
+        for (b = 0; b < q.length; ++b) {
+          c = q[b].name || 'An unnamed cell';
+          if (-1 != n.indexOf(q[b].id)) {
+            c = n[0].name;
+          };
+          if (!(Q || 0 != n.length && n[0].name == c)) {
             c = 'An unnamed cell';
           };
           c = b + 1 + '. ' + c;
@@ -618,7 +644,7 @@
 
   function Cell(id, x, y, size, color, isVirus, name) {
     r.push(this);
-    y[id] = this;
+    z[id] = this;
     this.id = id;
     this.ox = this.x = x;
     this.oy = this.y = y;
@@ -631,7 +657,7 @@
     this.setName(name);
   }
 
-  function na(a) {
+  function oa(a) {
     for (a = a.toString(16); 6 > a.length;) {
       a = '0' + a;
     }
@@ -655,18 +681,18 @@
   } else {
     V = null;
     h = null;
-    w = 0;
     x = 0;
+    y = 0;
     D = [];
-    m = [];
-    y = {};
+    n = [];
+    z = {};
     r = [];
     E = [];
-    z = [];
+    q = [];
     mouseX = 0;
     mouseY = 0;
-    J = -1;
-    K = -1;
+    L = -1;
+    M = -1;
     Ba = 0;
     F = 0;
     H = null;
@@ -676,17 +702,17 @@
     $ = 10000;
     zoom = 1;
     W = null;
-    ra = true;
-    O = true;
+    sa = true;
+    Q = true;
     hardMode = false;
     aa = false;
     I = 0;
     blackTheme = false;
-    sa = false;
+    ta = false;
     isMobile = 'ontouchstart' in window && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     ca = new Image();
     ca.src = 'img/split.png';
-    L = null;
+    N = null;
     window.setNick = function (e) {
       jQuery('#adsBottom').hide();
       H = e;
@@ -696,10 +722,10 @@
     };
     window.setRegion = ia;
     window.setSkins = function (e) {
-      ra = e;
+      sa = e;
     };
     window.setNames = function (e) {
-      O = e;
+      Q = e;
     };
     window.setDarkTheme = function (e) {
       blackTheme = e;
@@ -708,16 +734,16 @@
       hardMode = e;
     };
     window.setShowMass = function (e) {
-      sa = e;
+      ta = e;
     };
     window.connect = la;
-    pa = -1;
     qa = -1;
+    ra = -1;
     renderedScoreboard = null;
-    q = 1;
-    M = null;
-    P = {};
-    Ea = 'poland;usa;china;russia;canada;australia;spain;brazil;germany;ukraine;france;sweden;hitler;north korea;south korea;japan;united kingdom;earth;greece;latvia;lithuania;estonia;finland;norway;cia;maldivas;austria;nigeria;reddit;yaranaika;confederate;9gag;indiana;4chan;italy;ussr;pewdiepie;bulgaria;tumblr;2ch.hk;hong kong;portugal;jamaica;german empire;mexico;sanik;switzerland;croatia;chile;indonesia;bangladesh;thailand;iran;iraq;peru;moon;botswana;bosnia;netherlands;european union;taiwan;pakistan;hungary;satanist;qing dynasty;nazi;matriarchy;patriarchy;feminism;ireland;texas;facepunch;prodota;cambodia;steam;piccolo;ea;india;kc;denmark;quebec;ayy lmao;sealand;bait;tsarist russia;origin;vinesauce;stalin;belgium;luxembourg;stussy;prussia;8ch;argentina;scotland;m\'blob'.split(';');
+    w = 1;
+    O = null;
+    R = {};
+    Ea = 'poland;usa;china;russia;canada;australia;spain;brazil;germany;ukraine;france;sweden;hitler;north korea;south korea;japan;united kingdom;earth;greece;latvia;lithuania;estonia;finland;norway;cia;maldivas;austria;nigeria;reddit;yaranaika;confederate;9gag;indiana;4chan;italy;ussr;pewdiepie;bulgaria;tumblr;2ch.hk;hong kong;portugal;jamaica;german empire;mexico;sanik;switzerland;croatia;chile;indonesia;bangladesh;thailand;iran;iraq;peru;moon;botswana;bosnia;netherlands;european union;taiwan;pakistan;hungary;satanist;qing dynasty;nazi;matriarchy;patriarchy;feminism;ireland;texas;facepunch;prodota;cambodia;steam;piccolo;ea;india;kc;denmark;quebec;ayy lmao;sealand;bait;tsarist russia;origin;vinesauce;stalin;belgium;luxembourg;stussy;prussia;8ch;argentina;scotland;sir;romania;belarus;wojak;isis;doge'.split(';');
     Fa = ['m\'blob'];
     Cell.prototype = {
       id: 0,
@@ -748,11 +774,11 @@
             break;
           }
         }
-        delete y[this.id];
-        a = m.indexOf(this);
+        delete z[this.id];
+        a = n.indexOf(this);
         if (-1 != a) {
           aa = true;
-          m.splice(a, 1);
+          n.splice(a, 1);
         };
         a = D.indexOf(this.id);
         if (-1 != a) {
@@ -803,7 +829,7 @@
         }
       },
       getNumPoints: function () {
-        return ~~Math.max(this.size * zoom * (this.isVirus ? Math.min(2 * q, 1) : q), this.isVirus ? 10 : 5);
+        return ~~Math.max(this.size * zoom * (this.isVirus ? Math.min(2 * w, 1) : w), this.isVirus ? 10 : 5);
       },
       movePoints: function () {
         var a, b, c, d, e, g, h, k, l, m, n, p;
@@ -886,7 +912,7 @@
         return a;
       },
       shouldRender: function () {
-        return this.x + this.size + 40 < w - canvasWidth / 2 / zoom || this.y + this.size + 40 < x - canvasHeight / 2 / zoom || this.x - this.size - 40 > w + canvasWidth / 2 / zoom || this.y - this.size - 40 > x + canvasHeight / 2 / zoom ? false : true;
+        return this.x + this.size + 40 < x - canvasWidth / 2 / zoom || this.y + this.size + 40 < y - canvasHeight / 2 / zoom || this.x - this.size - 40 > x + canvasWidth / 2 / zoom || this.y - this.size - 40 > y + canvasHeight / 2 / zoom ? false : true;
       },
       draw: function () {
         var a, b, c;
@@ -917,13 +943,13 @@
           }
           ctx.closePath();
           a = this.name.toLowerCase();
-          if (ra) {
+          if (sa) {
             if (-1 != Ea.indexOf(a)) {
-              if (!P.hasOwnProperty(a)) {
-                P[a] = new Image();
-                P[a].src = 'skins/' + a + '.png';
+              if (!R.hasOwnProperty(a)) {
+                R[a] = new Image();
+                R[a].src = 'skins/' + a + '.png';
               };
-              b = P[a];
+              b = R[a];
             } else {
               b = null;
             };
@@ -948,14 +974,14 @@
           if (null != b && 0 < b.width && a) {
             ctx.drawImage(b, this.x - 2 * this.size, this.y - 2 * this.size, 4 * this.size, 4 * this.size);
           };
-          a = -1 != m.indexOf(this);
+          a = -1 != n.indexOf(this);
           b = ~~this.y;
-          if ((O || a) && this.name && this.nameCache) {
+          if ((Q || a) && this.name && this.nameCache) {
             c = this.nameCache.render();
             ctx.drawImage(c, ~~this.x - ~~(c.width / 2), b - ~~(c.height / 2));
             b += c.height / 2 + 4;
           };
-          if (sa && a) {
+          if (ta && a) {
             if (null == this.sizeCache) {
               this.sizeCache = new SizeCache(this.getNameSize() / 2, '#FFFFFF', true, '#000000');
             };

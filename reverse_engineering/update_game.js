@@ -28,12 +28,12 @@ walkers.VariableDeclarator = function (node, st, c) {
 }
 
 // Load the game code, beautify it and save it
-/*
+
 js = run("curl", ["http://agar.io/main_out.js"], {stdio: ["pipe","pipe","ignore"]}).toString()
 signature = hash(js)
 js = beautify(js)
 save("game.raw.js", js)
-/*/js = load("game.raw.js").toString()
+//js = load("game.raw.js").toString()
 
 // Abort de-obfuscation if we detect the dev uploaded non-minified code
 if (~js.indexOf("DOUBLE_BUFFER")) {
@@ -184,6 +184,7 @@ ast = parse(js);
 js = generate(ast)
 js = beautify(js)
 save("../mapping.js", js)
+console.log(signature)
 console.log(MAPPING)
 
 // Extremely basic string hasher
@@ -287,9 +288,19 @@ function exportSequence(prop) {
   return function (node, state) {
     if (!node[prop]) return
     if (!~["VariableDeclaration", "SequenceExpression"].indexOf(node[prop].type)) return
-
     var parent = state[state.length - 2]
-    var index = parent.body.indexOf(node)
+    var parentProp = "body";
+    if (parent.type === "SwitchStatement") {
+      parentProp = "consequent"
+      // Extract the case
+      for (var i = 0; i < parent.cases.length; i++) {
+        if (~parent.cases[i][parentProp].indexOf(node)) {
+          parent = parent.cases[i]
+          break
+        }
+      }
+    }
+    var index = parent[parentProp].indexOf(node)
 
     if (node[prop].type === "VariableDeclaration") {
       var vars = node[prop].declarations
@@ -301,12 +312,12 @@ function exportSequence(prop) {
         right: main.init
       }
       main.init = null
-      parent.body.splice(index, 0, node[prop])
+      parent[parentProp].splice(index, 0, node[prop])
       node[prop] = assignment
     }
 
     if (node[prop].type === "SequenceExpression") {
-      parent.body.splice(index, 0, node[prop])
+      parent[parentProp].splice(index, 0, node[prop])
       node[prop] = node[prop].expressions.pop()
     }
   }
@@ -421,6 +432,16 @@ function hoistVars(node, state) {
     // Oh fuck it, when will this ever not work anyway?
     node.type = "Identifier"
     node.name = node.declarations[0].id.name
+  } else if (parent.type === "SwitchStatement") {
+    // Extract the case
+    for (var i = 0; i < parent.cases.length; i++) {
+      if (~parent.cases[i].consequent.indexOf(node)) {
+        parent = parent.cases[i]
+        break
+      }
+    }
+    var index = parent.consequent.indexOf(node)
+    parent.consequent.splice.apply(parent.consequent, [index, 1].concat(splitted))
   } else {
     var index = parent.body.indexOf(node)
     parent.body.splice.apply(parent.body, [index, 1].concat(splitted))

@@ -8,5 +8,5 @@
         "js": ["injector.js"],
         "run_at": "document_end"
     }],
-    "web_accessible_resources": ["hijack.js", "override.js"]
+    "web_accessible_resources": ["hijack.js", "mapping.js", "override.js"]
 }
