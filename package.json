@@ -1,0 +1,19 @@
+{
+  "name": "agario-assist",
+  "version": "0.0.1",
+  "devDependencies": {
+    "babel": "^5.2.17",
+    "babelify": "^6.0.2",
+    "browserify": "^10.1.3",
+    "escodegen": "^1.6.1",
+    "escope": "^1.0.3",
+    "esprima": "^2.2.0",
+    "espurify": "^1.2.0",
+    "esquery": "^0.4.0",
+    "estraverse": "^4.1.0",
+    "js-beautify": "^1.5.5",
+    "lodash": "^3.8.0",
+    "minifyify": "^7.0.0",
+    "rsvp": "^3.0.18"
+  }
+}
