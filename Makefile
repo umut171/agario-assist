@@ -13,6 +13,7 @@ build:
 	cp src/injector.js build/injector.js
 	node_modules/.bin/browserify src/injected.js -t babelify -p [minifyify --no-map] --outfile build/injected.js
 	node_modules/.bin/browserify src/worker.js -t babelify -p [minifyify --no-map] --outfile build/worker.js
+	zip -r build/build build
 
 debug:
 	node_modules/.bin/babel-node scripts/debug.js
