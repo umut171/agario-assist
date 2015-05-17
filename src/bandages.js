@@ -11,7 +11,7 @@ function think() {
   K = QUAD.init // @QUAD
 }
 function calculateZoom() { zoom = (9 * zoom + sizeFactor) / 10 /* @sizeFactor */ }
-function Cell(id, x, y, size, color, isVirus, name) { this.points = [] }
+function Cell(id, x, y, size, color, name) { this.points = [] }
 function SizeCache(size, color, stroke, strokeColor) { this._strokeColor }
 
 // Variables
