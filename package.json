@@ -1,6 +1,6 @@
 {
   "name": "agario-assist",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "devDependencies": {
     "babel": "^5.2.17",
     "babelify": "^6.0.2",
